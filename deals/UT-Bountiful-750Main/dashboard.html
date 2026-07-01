@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCC ECE Underwriting — Deal Dashboard</title>
+<style>
+  :root{
+    --ink:#1a1a1a; --ink2:#444; --ink3:#6b6b6b; --line:#e2ded5; --line2:#d4cfc2;
+    --paper:#faf8f3; --card:#ffffff; --accent:#3a4a3f; --accent2:#5a6b5e;
+    --go:#2f6b43; --watch:#9a6a16; --pass:#8f3b34;
+    --go-bg:#eaf2ec; --watch-bg:#f6efe0; --pass-bg:#f5e9e7;
+    --chip:#f1eee7; --shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.03);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Iowan Old Style','Palatino Linotype',Georgia,serif;background:var(--paper);color:var(--ink);line-height:1.5;font-size:15px}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 30px 80px}
+  .topline{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line2);padding-bottom:10px;margin-bottom:4px}
+  .brand{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);font-family:-apple-system,sans-serif;font-weight:600}
+  .asof{font-size:12px;color:var(--ink3);font-family:-apple-system,sans-serif}
+  h1{font-size:26px;font-weight:600;margin:16px 0 2px;letter-spacing:-.01em}
+  .sub{color:var(--ink3);font-size:14px;margin-bottom:18px}
+  .sub .arch{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:3px;padding:1px 8px;font-size:11px;font-family:-apple-system,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-right:6px}
+
+  .callbar{display:flex;gap:18px;align-items:stretch;border:1px solid var(--line2);border-radius:6px;background:var(--card);box-shadow:var(--shadow);overflow:hidden;margin-bottom:22px}
+  .callbadge{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:18px 26px;min-width:150px;border-right:1px solid var(--line)}
+  .callbadge .label{font-family:-apple-system,sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+  .callbadge .verdict{font-size:34px;font-weight:700;letter-spacing:.02em;font-family:-apple-system,sans-serif}
+  .v-PASS{color:var(--pass)} .v-WATCH{color:var(--watch)} .v-GO{color:var(--go)}
+  .b-PASS{background:var(--pass-bg)} .b-WATCH{background:var(--watch-bg)} .b-GO{background:var(--go-bg)}
+  .callbody{padding:16px 22px;display:flex;flex-direction:column;justify-content:center}
+  .callbody .bc{font-family:-apple-system,sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+  .callbody .bctext{font-size:15px;color:var(--ink);font-weight:500}
+  .callbody .expl{font-size:13.5px;color:var(--ink2);margin-top:7px;line-height:1.55}
+
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line2);margin-bottom:20px;font-family:-apple-system,sans-serif}
+  .tab{padding:9px 15px;font-size:13px;color:var(--ink3);cursor:pointer;border:1px solid transparent;border-bottom:none;border-radius:5px 5px 0 0;letter-spacing:.02em;user-select:none}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--accent);background:var(--card);border-color:var(--line2);font-weight:600;margin-bottom:-1px}
+  .panel{display:none;animation:fade .2s ease} .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(2px)}to{opacity:1}}
+
+  .grid2{display:grid;grid-template-columns:340px 1fr;gap:24px}
+  @media(max-width:880px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:18px}
+  .card h3{font-family:-apple-system,sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;font-weight:700;border-bottom:1px solid var(--line);padding-bottom:8px}
+
+  .ctrl{margin-bottom:16px}
+  .ctrl label{display:flex;justify-content:space-between;font-family:-apple-system,sans-serif;font-size:12.5px;color:var(--ink2);margin-bottom:5px}
+  .ctrl label b{color:var(--accent);font-weight:700}
+  input[type=range]{width:100%;accent-color:var(--accent);height:4px}
+  select{width:100%;font-family:-apple-system,sans-serif;font-size:13px;padding:6px 8px;border:1px solid var(--line2);border-radius:4px;background:var(--paper);color:var(--ink)}
+  .resetbtn{font-family:-apple-system,sans-serif;font-size:12px;padding:7px 12px;border:1px solid var(--line2);background:var(--paper);border-radius:4px;cursor:pointer;color:var(--ink2);width:100%}
+  .resetbtn:hover{background:var(--chip)}
+
+  table{width:100%;border-collapse:collapse;font-family:-apple-system,sans-serif;font-size:13px}
+  th,td{text-align:right;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);font-weight:600;border-bottom:1px solid var(--line2)}
+  tbody tr:hover{background:var(--paper)}
+  .num{font-variant-numeric:tabular-nums}
+  .neg{color:var(--pass)} .pos{color:var(--go)}
+  .colhi{background:var(--go-bg)} .collo{background:var(--pass-bg)}
+
+  .bigfig{display:flex;gap:26px;flex-wrap:wrap;margin-bottom:6px}
+  .fig{flex:1;min-width:150px}
+  .fig .k{font-family:-apple-system,sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .fig .v{font-size:27px;font-weight:700;font-family:-apple-system,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:2px}
+  .fig .vsub{font-size:12px;color:var(--ink3);font-family:-apple-system,sans-serif}
+
+  .pill{display:inline-block;font-family:-apple-system,sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:3px;text-transform:uppercase}
+  .pill.pass{background:var(--go-bg);color:var(--go)} .pill.fail{background:var(--pass-bg);color:var(--pass)}
+  .tag{display:inline-block;font-family:-apple-system,sans-serif;font-size:10px;letter-spacing:.04em;padding:1px 6px;border-radius:3px;text-transform:uppercase;border:1px solid var(--line2);color:var(--ink3);margin-left:6px}
+  .tag.confirmed{color:var(--go);border-color:#bcd6c4;background:var(--go-bg)}
+  .tag.assumed{color:var(--watch);border-color:#e3d2a8;background:var(--watch-bg)}
+  .tag.inferred{color:var(--ink3)}
+
+  .note{font-size:13px;color:var(--ink2);line-height:1.6;margin-top:4px}
+  .note.warn{background:var(--watch-bg);border-left:3px solid var(--watch);padding:10px 12px;border-radius:0 4px 4px 0;font-family:-apple-system,sans-serif;font-size:12.5px}
+  ul.clean{list-style:none;font-family:-apple-system,sans-serif;font-size:13px}
+  ul.clean li{padding:7px 0 7px 18px;position:relative;border-bottom:1px solid var(--line);color:var(--ink2)}
+  ul.clean li:before{content:"—";position:absolute;left:0;color:var(--accent2)}
+  .kv{display:flex;justify-content:space-between;font-family:-apple-system,sans-serif;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)}
+  .kv .key{color:var(--ink3)} .kv .val{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+  .spine{font-family:-apple-system,sans-serif}
+  .step{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+  .step .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .step .t{font-size:13px}.step .t b{display:block;color:var(--ink);font-size:13.5px}
+  .step .t span{color:var(--ink3);font-size:12px}
+  .step .done{margin-left:auto;font-size:11px;color:var(--go);font-weight:700;letter-spacing:.04em}
+  footer{margin-top:30px;font-family:-apple-system,sans-serif;font-size:11px;color:var(--ink3);border-top:1px solid var(--line);padding-top:12px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topline">
+    <span class="brand">Clay Cove Capital · ECE Underwriting Engine</span>
+    <span class="asof" id="asof"></span>
+  </div>
+  <h1 id="dealname"></h1>
+  <div class="sub" id="dealsub"></div>
+
+  <div class="callbar" id="callbar">
+    <div class="callbadge" id="callbadge">
+      <span class="label">The Call</span>
+      <span class="verdict" id="verdict"></span>
+    </div>
+    <div class="callbody">
+      <span class="bc">Binding constraint</span>
+      <span class="bctext" id="bctext"></span>
+      <span class="expl" id="bcexpl"></span>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <!-- SCENARIO -->
+  <div class="panel active" data-panel="scenario">
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <h3>Scenario Levers — live</h3>
+          <div class="ctrl"><label>Licensed capacity (kids) <b id="o_cap"></b></label><input type="range" id="cap" min="80" max="184" step="2"></div>
+          <div class="ctrl"><label>Occupancy <b id="o_occ"></b></label><input type="range" id="occ" min="70" max="100" step="1"></div>
+          <div class="ctrl"><label>Rent / revenue cap <b id="o_rc"></b></label><input type="range" id="rc" min="10" max="22" step="1"></div>
+          <div class="ctrl"><label>Blended tuition $/mo <b id="o_tui"></b></label><input type="range" id="tui" min="1200" max="2600" step="20"></div>
+          <div class="ctrl"><label>CapEx $/SF <b id="o_cx"></b></label><input type="range" id="cx" min="150" max="260" step="5"></div>
+          <div class="ctrl"><label>Market going-in yield <b id="o_my"></b></label><input type="range" id="my" min="60" max="90" step="1"></div>
+          <div class="ctrl"><label>Spread target (bps) <b id="o_sp"></b></label><input type="range" id="sp" min="100" max="300" step="10"></div>
+          <button class="resetbtn" id="reset">Reset to Base case</button>
+        </div>
+        <div class="card">
+          <h3>Preset scenarios</h3>
+          <select id="preset">
+            <option value="">— jump to a case —</option>
+            <option value="Conservative">Conservative (Floor)</option>
+            <option value="Lower Base">Lower Base (Target)</option>
+            <option value="Upper Base">Upper Base</option>
+            <option value="Aggressive">Aggressive (Stretch)</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h3>Live result</h3>
+          <div class="bigfig">
+            <div class="fig"><div class="k">Max bid (post-buffer)</div><div class="v num" id="r_bid"></div><div class="vsub" id="r_bidpsf"></div></div>
+            <div class="fig"><div class="k">vs owner basis</div><div class="v num" id="r_vs"></div><div class="vsub" id="r_owner"></div></div>
+            <div class="fig"><div class="k">Going-in cap (all-in)</div><div class="v num" id="r_cap"></div><div class="vsub">YOC gate 9.25%</div></div>
+          </div>
+          <div class="note warn" id="r_flag"></div>
+          <table style="margin-top:14px">
+            <tbody id="r_break"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Scenario bid grid (template logic)</h3>
+          <table><thead><tr><th>Case</th><th>Occ</th><th>Rent$/SF</th><th>Max basis</th><th>CapEx</th><th>Max bid</th><th>vs owner</th></tr></thead>
+          <tbody id="gridbody"></tbody></table>
+          <div class="note">Owner's April-2026 cost basis is the floor on any off-market approach. Negative "vs owner" = bid below what they paid.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TESTS -->
+  <div class="panel" data-panel="tests">
+    <div class="card">
+      <h3>Go / No-Go Test Battery — per scenario</h3>
+      <table><thead><tr><th>Gate</th><th>Conservative</th><th>Lower Base</th><th>Upper Base</th><th>Aggressive</th></tr></thead>
+      <tbody id="testbody"></tbody></table>
+      <div class="note" style="margin-top:12px"><b>S</b> = shared gates · <b>C</b> = conversion gates. A deal is GO only if the binding gates clear at a credible case.</div>
+    </div>
+    <div class="card">
+      <h3>Binding constraint &amp; reset conditions</h3>
+      <div class="kv"><span class="key">Binding constraint</span><span class="val" id="t_bc"></span></div>
+      <p class="note" id="t_expl"></p>
+      <h3 style="margin-top:18px">What would change the answer</h3>
+      <ul class="clean" id="t_resets"></ul>
+    </div>
+  </div>
+
+  <!-- COMPS -->
+  <div class="panel" data-panel="comps">
+    <div class="card">
+      <h3>Lease comps — rent tiers</h3>
+      <table><thead><tr><th>Tier</th><th>Min</th><th>Median</th><th>Max</th><th>Read</th></tr></thead><tbody id="rentbody"></tbody></table>
+      <div class="note warn" id="rentwarn"></div>
+    </div>
+    <div class="card">
+      <h3>Sale comps &amp; cap signal</h3>
+      <div id="salebody"></div>
+    </div>
+  </div>
+
+  <!-- TUITION -->
+  <div class="panel" data-panel="tuition">
+    <div class="card">
+      <h3>Tuition bands — monthly <span class="tag assumed">assumed</span></h3>
+      <table><thead><tr><th>Age band</th><th>Low (−15%)</th><th>Base</th><th>High (+15%)</th></tr></thead><tbody id="tuibody"></tbody></table>
+      <div class="note" id="tuinote"></div>
+    </div>
+  </div>
+
+  <!-- CAPEX -->
+  <div class="panel" data-panel="capex">
+    <div class="card">
+      <h3>CapEx tiers</h3>
+      <table><thead><tr><th>Tier</th><th>$/SF</th><th>Total</th><th>Read</th></tr></thead><tbody id="cxbody"></tbody></table>
+    </div>
+    <div class="card">
+      <h3>Goddard-required scope &amp; VE targets</h3>
+      <table><thead><tr><th>Scope item</th><th>$/SF</th><th>$ (base)</th></tr></thead><tbody id="scopebody"></tbody></table>
+      <h3 style="margin-top:18px">Value-engineering targets (ranked)</h3>
+      <ul class="clean" id="vebody"></ul>
+    </div>
+  </div>
+
+  <!-- SITE -->
+  <div class="panel" data-panel="site">
+    <div class="grid2">
+      <div class="card"><h3>Property</h3><div id="sitefacts"></div></div>
+      <div class="card"><h3>Deal &amp; approach</h3><div id="dealfacts"></div>
+        <div class="note warn" style="margin-top:12px" id="approachnote"></div>
+      </div>
+    </div>
+    <div class="card"><h3>Open items</h3><ul class="clean" id="openitems"></ul></div>
+  </div>
+
+  <!-- SPINE -->
+  <div class="panel" data-panel="spine">
+    <div class="card"><h3>The underwriting spine — run of show</h3><div class="spine" id="spine"></div>
+    <div class="note" style="margin-top:14px">Each stage is a skill that reads upstream artifacts and writes its own JSON/Excel into the deal folder. The orchestrator (<i>deal-lead</i>) sequences them; checkpoint mode pauses after each for partner review.</div></div>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+/* ============================================================
+   DEAL DATA — the reusable shell reads THIS object.
+   To render a new deal: replace DEAL with that deal's artifacts
+   (or, in the Claude Code build, fetch the deal's JSON files).
+   ============================================================ */
+const DEAL = {"meta":{"id":"UT-BOUNTIFUL-750MAIN","name":"750 S Main St — Bountiful, UT","archetype":"Conversion","approach":"Off-market acquisition","asOf":"2026-06-26","sub":"11,574 SF Class B office (1964) · 0.85 AC · ~92% vacant · Davis County / Salt Lake City"},"call":{"verdict":"PASS","binding":"Bid headroom vs owner basis (C3) — secondarily rent test (C1)","expl":"A basis deal, not a yield deal. YOC and spread pass by construction at every case. CCC's defensible max bid (Floor −$0.34M, Target $1.09M) sits below the owner's ~$1.57M April-2026 cost. It only clears at Upper Base / Aggressive, which require occupancy 90–95% + rent-cap 18–20% + Base/High tuition stacking at once — and the affordable rent those cases imply ($36–49/SF) is far above any rent comp in hand. C1 fails exactly where C3 passes."},"base":{"cap":120,"occ":0.85,"rc":0.15,"tui":1790,"cx":200,"my":0.075,"sp":0.02,"buffer":0.05,"sf":11574,"owner":1570500},"presets":{"Conservative":{"cap":120,"occ":0.8,"rc":0.13,"tui":1521.5,"cx":235,"my":0.0766,"sp":0.02},"Lower Base":{"cap":120,"occ":0.85,"rc":0.15,"tui":1790,"cx":200,"my":0.075,"sp":0.02},"Upper Base":{"cap":120,"occ":0.9,"rc":0.18,"tui":1790,"cx":200,"my":0.075,"sp":0.02},"Aggressive":{"cap":120,"occ":0.95,"rc":0.2,"tui":2058.5,"cx":170,"my":0.0725,"sp":0.02}},"gridOrder":["Conservative","Lower Base","Upper Base","Aggressive"],"gridLabel":{"Conservative":"Conservative (Floor)","Lower Base":"Lower Base (Target)","Upper Base":"Upper Base","Aggressive":"Aggressive (Stretch)"},"tests":{"binding":"C3 — bid vs owner basis (then C1 rent)","expl":"YOC and spread pass by construction; the deal dies on basis. Max bid beats the owner's ~$1.57M only at Upper Base / Aggressive, and those same cases imply $36–49/SF affordable rent — far above the $10–20/SF net-effective office comps in hand. No single reset clears both gates at a credible scenario.","resets":["Real ECE NNN rent comps ($30+/SF) AND real Goddard tuition at/above assumed Base — could make Upper Base credible. Most worth checking before walking.","Site plan supports >150 licensed seats — lifts revenue 30–50%, the biggest mechanical lever.","Owner sells near ~$1.57M basis (no markup) AND CapEx value-engineered to ~$180/SF.","By-right entitlement confirmed (no CUP/rezone) — removes uncosted carry/timeline drag."],"rows":[{"g":"S1 · Yield-on-cost (≥9.25%)","v":{"Conservative":"P 9.59%","Lower Base":"P 9.66%","Upper Base":"P 9.73%","Aggressive":"P 9.57%"}},{"g":"S2 · Spread vs cap (≥200bp)","v":{"Conservative":"P","Lower Base":"P","Upper Base":"P","Aggressive":"P"}},{"g":"S3 · Capacity sanity (164–184)","v":{"Conservative":"F 120","Lower Base":"F 120","Upper Base":"F 120","Aggressive":"F 120"}},{"g":"S4 · Occupancy realism (≥80%)","v":{"Conservative":"P 80%","Lower Base":"P 85%","Upper Base":"P 90%","Aggressive":"P 95%"}},{"g":"C1 · Rent test (within comp)","v":{"Conservative":"F 19.7","Lower Base":"F 28.4","Upper Base":"F 36.1","Aggressive":"F 48.7"}},{"g":"C2 · CapEx reasonableness","v":{"Conservative":"F 235","Lower Base":"P 200","Upper Base":"P 200","Aggressive":"P 170"}},{"g":"C3 · Bid headroom vs owner","v":{"Conservative":"F -0.34M","Lower Base":"F 1.09M","Upper Base":"P 1.98M","Aggressive":"P 3.92M"}},{"g":"C4 · Replacement-cost check","v":{"Conservative":"P","Lower Base":"F","Upper Base":"F","Aggressive":"F"}}]},"comps":{"rent":[{"t":"T1 · subject building (net-eff)","min":10,"med":12,"max":14,"read":"Subject office leases clear $14–20 FS gross; ~$10–14 net of opex"},{"t":"T2 · Davis/Weber 2–4★ (net-eff)","min":17,"med":18.5,"max":20,"read":"Submarket office ~$25 gross less opex"},{"t":"T3 · ECE NNN comps","min":null,"med":null,"max":null,"read":"GAP — not in CoStar office page; pull from research DB"}],"rentwarn":"All office leases are Full-Service / Modified-Gross, not NNN. The rent test compares net-effective. The figure the test truly needs — Goddard/Primrose NNN childcare rent — is not in the uploaded materials and is flagged for the research DB.","sale":"Subject's own arm's-length trade Apr-2026: <b>$1,570,500 · $135.69/SF · 7.66% cap</b> (office). Submarket 2–4★ office sales ~$162/SF. No ECE-use cap comps available — the 7.66% office cap is used as a flagged proxy for the ECE going-in cap (n=1, office not ECE)."},"tuition":{"bands":[["Infants",1700,2000,2300],["Toddlers",1615,1900,2185],["Twos",1530,1800,2070],["Preschool / Pre-K",1445,1700,1955]],"note":"Income-indexed estimate (Davis County median HH income ~$101.5K, 1 direct competitor within 3mi). NOT triangulated from published rates — replace with ≥2 real operator rate cards on DB connect. This is the most leveraged assumption carrying the least real data."},"capex":{"tiers":[["Conservative",235,2719890,"Upper half of Pflugerville band — 1964 vintage + sprinkler trigger"],["Base",200,2314800,"Benchmark midpoint, full Goddard scope"],["Aggressive",170,1967580,"Lean VE; just below $180 floor — a stretch, not a base"]],"scope":[["Crash-rated bollards / fencing",14,162000],["Full HVAC replacement",24,278000],["All-new playground + turf",11,127000],["Restroom relocations (code)",9,104000],["Fire-sprinkler retrofit (occupancy change)",6,69000]],"ve":["Bollard COUNT via layout (never the rating) — biggest lever, save ~$4–7/SF","Right-size playground to actual licensed capacity — save ~$2–3/SF","Reuse recent office finishes where code allows — save ~$2–4/SF","Trim MEP to HVAC-only if survey supports — save ~$1–3/SF (never cut sprinkler)"]},"site":{"facts":[["Building SF (CoStar RBA)","11,574"],["Land","0.85 AC / 37,026 SF"],["Year built","1964"],["Construction","Masonry, 1-story, 14′ slab-to-slab"],["Parking","51 surface (4.41/1,000)"],["Sprinklers","None — retrofit likely on occupancy change"],["Zoning","R-1-10 (residential)"],["Current use","Class B office, ~92% vacant"]],"deal":[["Approach","Off-market to current owner"],["Owner / counterparty","King Street Realty & Mgmt LLC"],["Owner cost basis","$1,570,500 ($135.69/SF)"],["Trade date","April 2026"],["Cap at trade","7.66%"],["Asking rent","$23.50/SF MG (not NNN)"],["List sale price","None — marketed for lease"]],"approachNote":"Zoning is R-1-10 (residential). Childcare is almost certainly not by-right — expect a CUP or rezone. Treat entitlement as a live gate, and note its carry/timeline cost is not yet in the model.","open":["Owner basis ($1.57M) vs max bid — an off-market spread problem, decide whether to engage at all.","Tuition (assumed) + ECE cap (office proxy) need real comps — could move the grid materially.","R-1-10 entitlement: CUP/rezone path + cost not yet underwritten.","GC takeoff to replace benchmark CapEx.","Site plan: confirm licensed seats the lot actually supports."]},"spine":[["1","Intake → site_card.json","Raw inbound → canonical record + archetype + flags","done"],["2","Comps → comps.json","Sale/lease comps → rent tiers + median cap","done"],["3","Tuition → tuition.json","Age-band Low/Base/High by submarket","done"],["4","CapEx → capex.json","Bottom-up tiers + Goddard scope + VE targets","done"],["5","Underwrite → engine","buildGrid backsolves max bid vs owner basis","done"],["6","Test battery → tests.json","Engine gates across scenarios → binding constraint + call","done"],["7","Deal memo → deal_memo.md","Deal card + IC memo in CCC voice","next"],["8","Pipeline rollup","Log to master asset log + dashboard","next"]]};
+
+/* ---------- engine: inlined from engine/ — single source of truth (do not edit; run `node web/build.mjs`) ---------- */
+const STANDARDS = {
+  "_source": "Machine-readable mirror of knowledge/standards/. Change a platform constant HERE; the engine and every consumer update. Prose rationale stays in knowledge/standards/*.md.",
+  "_version": "1.0.0",
+
+  "gates": {
+    "min_yoc": 0.0925,
+    "min_spread_bps": 200,
+    "occ_floor": 0.80,
+    "negotiation_buffer": 0.05,
+    "prototype_capacity": [164, 184],
+    "conversion_capex_band_psf": [180, 254]
+  },
+
+  "scenario_levers": {
+    "Conservative": { "label": "Conservative (Floor)", "occ": 0.80, "rent_cap": 0.13, "tuition": "low",  "capex": "high", "yield": "high" },
+    "Lower Base":   { "label": "Lower Base (Target)",   "occ": 0.85, "rent_cap": 0.15, "tuition": "base", "capex": "base", "yield": "base" },
+    "Upper Base":   { "label": "Upper Base",            "occ": 0.90, "rent_cap": 0.18, "tuition": "base", "capex": "base", "yield": "base" },
+    "Aggressive":   { "label": "Aggressive (Stretch)",  "occ": 0.95, "rent_cap": 0.20, "tuition": "high", "capex": "low",  "yield": "low" }
+  },
+  "scenario_order": ["Conservative", "Lower Base", "Upper Base", "Aggressive"],
+
+  "tuition_band_spread": 0.15,
+
+  "grid_mapping": {
+    "floor": "Conservative",
+    "target": "Lower Base",
+    "stretch": "Aggressive"
+  }
+};
+/**
+ * underwrite.mjs — THE backsolve. Single source of truth for the bid math.
+ *
+ * Formula chain (conversion archetype), identical to the dashboard's verified
+ * engineCompute() and the Bountiful underwrite.json grid:
+ *
+ *   revenue  = capacity × occupancy × tuition × 12
+ *   noi      = revenue × rent_cap                 (affordable rent the OpCo can pay)
+ *   rent/sf  = noi ÷ sf
+ *   maxBasis = noi ÷ (market_yield + spread)      (capitalize at the target yield)
+ *   capex$   = capex_psf × sf
+ *   preBuf   = maxBasis − capex$
+ *   bid      = preBuf × (1 − buffer)              (negotiation buffer below max)
+ *   allIn    = bid + capex$
+ *   goingIn  = noi ÷ allIn                        (going-in cap on the all-in basis)
+ *
+ * Excel becomes an export format and the web dashboard imports THIS — no parallel math.
+ */
+
+
+/**
+ * The atomic backsolve over one fully-resolved scenario.
+ * @param {import("./schema.mjs").CaseInputs} s
+ * @param {{ sf:number, owner_basis:number, buffer:number }} ctx
+ * @returns {import("./schema.mjs").CaseResult}
+ */
+function engineCompute(s, ctx) {
+  const { sf, owner_basis, buffer } = ctx;
+  const stab_revenue = s.cap * s.occ * s.tui * 12;
+  const noi = stab_revenue * s.rc;
+  const aff_rent_psf = noi / sf;
+  const target_yield = s.my + s.sp;
+  const max_basis = noi / target_yield;
+  const capex_total = s.cx * sf;
+  const pre_buffer_bid = max_basis - capex_total;
+  const final_bid = pre_buffer_bid * (1 - buffer);
+  const all_in = final_bid + capex_total;
+  const going_in_cap = all_in > 0 ? noi / all_in : 0;
+  return {
+    case: s.case,
+    stab_revenue, noi, aff_rent_psf, target_yield, max_basis, capex_total,
+    pre_buffer_bid, final_bid,
+    bid_psf: final_bid / sf,
+    all_in, going_in_cap,
+    vs_owner: final_bid - owner_basis,
+  };
+}
+
+/**
+ * Resolve a deal's per-tier inputs into the concrete levers for one scenario case,
+ * using the generic scenario_levers in standards.json.
+ * @param {import("./schema.mjs").Deal} deal
+ * @param {string} caseName
+ * @returns {import("./schema.mjs").CaseInputs}
+ */
+function resolveCase(deal, caseName) {
+  const lever = STANDARDS.scenario_levers[caseName];
+  if (!lever) throw new Error(`Unknown scenario case: ${caseName}`);
+  const spread = deal.tuition_spread ?? STANDARDS.tuition_band_spread;
+  const tui =
+    lever.tuition === "low"  ? deal.tuition_base * (1 - spread) :
+    lever.tuition === "high" ? deal.tuition_base * (1 + spread) :
+                               deal.tuition_base;
+  return {
+    case: caseName,
+    cap: deal.capacity,
+    occ: lever.occ,
+    rc: lever.rent_cap,
+    tui,
+    cx: deal.capex_psf[lever.capex],
+    my: deal.market_yield[lever.yield],
+    sp: deal.spread,
+  };
+}
+
+/**
+ * Run the full scenario grid for a deal (Conservative → Aggressive).
+ * @param {import("./schema.mjs").Deal} deal
+ * @returns {import("./schema.mjs").CaseResult[]}
+ */
+function buildGrid(deal) {
+  const buffer = deal.buffer ?? STANDARDS.negotiation_buffer;
+  const ctx = { sf: deal.sf, owner_basis: deal.owner_basis, buffer };
+  return STANDARDS.scenario_order.map((name) => engineCompute(resolveCase(deal, name), ctx));
+}
+
+/**
+ * tests.mjs — the go/no-go battery. Deterministic gate math only.
+ *
+ * Division of labor: the engine returns each gate's PASS/FAIL + value + margin per
+ * scenario (the part a machine can own rigorously). The GO/WATCH/PASS *nuance* —
+ * whether a clearing case is credible — stays with the memo/human layer. The engine
+ * gives an honest mechanical screen: PASS when no case clears the decision gates,
+ * else REVIEW (a human judges credibility for GO vs WATCH).
+ *
+ * Corrections vs the hand-built tests.json fixture (now superseded by this engine):
+ *  - S1/S2 are passed-by-construction (target_yield = market_yield + spread_target);
+ *    represented honestly rather than as circular restatements.
+ *  - C4 reads all-in basis vs the ground-up alternative (the fixture mixed all-in,
+ *    max-basis, and a typo'd value across cases).
+ */
+
+
+const bps = (x) => Math.round(x * 10000);
+
+/** Decision gates for the conversion archetype — the ones a case must clear to "GO". */
+const DECISION_GATES = ["S1_yoc", "S2_spread", "S4_occ", "C1_rent", "C3_headroom"];
+
+/**
+ * Run every gate for one computed case.
+ * @param {import("./schema.mjs").CaseResult} r
+ * @param {import("./schema.mjs").Deal} deal
+ * @returns {Record<string, import("./schema.mjs").TestResult>}
+ */
+function runCaseTests(r, deal) {
+  const g = STANDARDS.gates;
+  const band = deal.rent_bands?.[r.case];
+  const capexFlag = deal.capex_reasonableness_psf ?? 200; // Pflugerville midpoint; goddard band is 180–254
+  const groundUp = deal.ground_up_alt ?? null;
+
+  return {
+    S1_yoc: {
+      pass: r.going_in_cap >= g.min_yoc,
+      value: round(r.going_in_cap, 4),
+      threshold: g.min_yoc,
+      margin_bps: bps(r.going_in_cap - g.min_yoc),
+    },
+    S2_spread: {
+      // structural: model solves at market_yield + spread_target, so spread = target by construction.
+      pass: bps(deal.spread) >= g.min_spread_bps,
+      value: deal.spread,
+      threshold: g.min_spread_bps / 10000,
+      margin_bps: bps(deal.spread) - g.min_spread_bps,
+      note: `structural — target yield = market yield + spread. The real question is whether the market-yield anchor is right; comp median cap (${deal.median_cap ?? "n/a"}) validates it — a comps-quality check, flagged separately.`,
+    },
+    S3_capacity: {
+      pass: isWithin(deal.capacity, g.prototype_capacity),
+      value: deal.capacity,
+      threshold: `${g.prototype_capacity[0]}–${g.prototype_capacity[1]}`,
+      note: deal.capacity < g.prototype_capacity[0] ? "below prototype — reduced-capacity basis" : undefined,
+    },
+    S4_occ: { pass: r_occ(r, deal) >= g.occ_floor, value: r_occ(r, deal), threshold: g.occ_floor },
+    C1_rent: {
+      pass: band ? r.aff_rent_psf >= band[0] && r.aff_rent_psf <= band[1] : false,
+      value: round(r.aff_rent_psf, 2),
+      band,
+      note: band && r.aff_rent_psf > band[1] ? "affordable rent above comp ceiling — needs rent the market may not bear" : undefined,
+    },
+    C2_capex: {
+      pass: capexPsf(r, deal) <= capexFlag,
+      value: capexPsf(r, deal),
+      threshold: `≤${capexFlag}`,
+      note: capexPsf(r, deal) > capexFlag ? "above reasonableness flag — heavy Goddard scope / vintage" : undefined,
+    },
+    C3_headroom: {
+      pass: r.final_bid >= headroomAnchor(deal),
+      value: Math.round(r.final_bid),
+      threshold: Math.round(headroomAnchor(deal)),
+      note: r.final_bid < headroomAnchor(deal) ? "max bid below owner basis / ask" : undefined,
+    },
+    C4_repl_cost: groundUp == null ? { pass: true, value: "n/a" } : {
+      pass: r.all_in < groundUp,
+      value: Math.round(r.all_in),
+      threshold: groundUp,
+      note: r.all_in >= groundUp ? "all-in ≥ ground-up alt — conversion premium eroded" : undefined,
+    },
+  };
+}
+
+/**
+ * Battery across the whole grid → per-case tests + a mechanical call.
+ * @param {import("./schema.mjs").CaseResult[]} grid
+ * @param {import("./schema.mjs").Deal} deal
+ */
+function runBattery(grid, deal) {
+  const scenarios = {};
+  for (const r of grid) scenarios[r.case] = runCaseTests(r, deal);
+
+  const clears = (name) => DECISION_GATES.every((k) => scenarios[name][k].pass);
+  const clearing_cases = grid.map((r) => r.case).filter(clears);
+
+  // gates that fail in EVERY case (the hard, always-binding constraints)
+  const always_failing = DECISION_GATES.filter((k) => grid.every((r) => !scenarios[r.case][k].pass));
+  const headroom_clears_at = grid.filter((r) => scenarios[r.case].C3_headroom.pass).map((r) => r.case);
+
+  const call = clearing_cases.length === 0 ? "PASS" : "REVIEW";
+  const binding_note = clearing_cases.length === 0
+    ? buildBindingNote(always_failing, headroom_clears_at)
+    : `Clears decision gates at: ${clearing_cases.join(", ")}. Human review for GO vs WATCH on lever credibility.`;
+
+  return { scenarios, clearing_cases, always_failing, headroom_clears_at, call, binding_note };
+}
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+const round = (n, d) => Number(n.toFixed(d));
+const isWithin = (v, [lo, hi]) => v >= lo && v <= hi;
+const r_occ = (r) => STANDARDS.scenario_levers[r.case].occ;                 // occupancy lever for the case
+const capexPsf = (r, deal) => Math.round(r.capex_total / deal.sf);
+const headroomAnchor = (deal) => deal.ask ?? deal.owner_basis;             // ask if listed, else owner basis (off-market)
+function buildBindingNote(always_failing, headroom_clears_at) {
+  const parts = [];
+  if (always_failing.includes("C1_rent")) parts.push("C1 (rent) fails in every case");
+  if (headroom_clears_at.length && always_failing.includes("C1_rent"))
+    parts.push(`C3 (headroom) clears only at ${headroom_clears_at.join("/")} — exactly where the rent test fails hardest`);
+  parts.push("no case clears both the rent and headroom gates");
+  return parts.join("; ") + ".";
+}
+
+/**
+ * ECE Underwriting Engine — public API.
+ *
+ *   import { underwrite } from "./engine/index.mjs";
+ *   const result = underwrite(deal);   // → { grid, battery, headline }
+ *
+ * One module, no build step, runs in node and (served) in the browser. Excel is an
+ * export format; the web dashboard imports THIS. No parallel math.
+ */
+
+
+/**
+ * Underwrite a deal end-to-end: scenario grid + test battery + headline read.
+ * @param {import("./schema.mjs").Deal} deal
+ */
+function underwrite(deal) {
+  const grid = buildGrid(deal);
+  const battery = runBattery(grid, deal);
+  const byCase = Object.fromEntries(grid.map((r) => [r.case, r]));
+  const m = STANDARDS.grid_mapping;
+  return {
+    grid,
+    battery,
+    headline: {
+      call: battery.call,
+      floor_bid: byCase[m.floor].final_bid,
+      target_bid: byCase[m.target].final_bid,
+      stretch_bid: byCase[m.stretch].final_bid,
+      owner_basis: deal.owner_basis,
+      spread_to_owner_at_target: byCase[m.target].vs_owner,
+      binding_note: battery.binding_note,
+    },
+  };
+}
+
+function computeView(s){
+  const ctx={sf:DEAL.base.sf,owner_basis:DEAL.base.owner,buffer:DEAL.base.buffer};
+  const r=engineCompute({case:s.case||'_',cap:s.cap,occ:s.occ,rc:s.rc,tui:s.tui,cx:s.cx,my:s.my,sp:s.sp},ctx);
+  return {rev:r.stab_revenue,noi:r.noi,rentPsf:r.aff_rent_psf,tgtYield:r.target_yield,maxBasis:r.max_basis,capexTotal:r.capex_total,preBuf:r.pre_buffer_bid,bid:r.final_bid,allIn:r.all_in,goingIn:r.going_in_cap,vs:r.vs_owner};
+}
+
+const fmt$=(n)=> (n<0?"−$":"$")+Math.abs(Math.round(n)).toLocaleString();
+const fmtM=(n)=> (n<0?"−$":"$")+(Math.abs(n)/1e6).toFixed(2)+"M";
+const pct=(n)=> (n*100).toFixed(2)+"%";
+
+let state = {...DEAL.base};
+const $=(id)=>document.getElementById(id);
+
+function syncSliders(){
+  $("cap").value=state.cap; $("occ").value=state.occ*100; $("rc").value=state.rc*100;
+  $("tui").value=state.tui; $("cx").value=state.cx; $("my").value=state.my*1000; $("sp").value=state.sp*10000;
+}
+function render(){
+  $("o_cap").textContent=state.cap; $("o_occ").textContent=pct(state.occ);
+  $("o_rc").textContent=pct(state.rc); $("o_tui").textContent="$"+state.tui;
+  $("o_cx").textContent="$"+state.cx; $("o_my").textContent=pct(state.my); $("o_sp").textContent=(state.sp*10000)+" bp";
+  const r=computeView(state);
+  $("r_bid").textContent=fmtM(r.bid); $("r_bid").className="v num "+(r.bid<0?"neg":"");
+  $("r_bidpsf").textContent=(r.bid>0?"$"+Math.round(r.bid/DEAL.base.sf)+"/SF":"—");
+  $("r_vs").textContent=fmtM(r.vs); $("r_vs").className="v num "+(r.vs<0?"neg":"pos");
+  $("r_owner").textContent="owner $"+(DEAL.base.owner/1e6).toFixed(2)+"M";
+  $("r_cap").textContent=pct(r.goingIn);
+  const flag = r.vs<0
+    ? "Below owner's basis by "+fmtM(Math.abs(r.vs))+". On an off-market approach the owner's fresh cost is the floor — this bid doesn't clear it."
+    : "Clears owner's basis by "+fmtM(r.vs)+" — check whether the levers driving it (occupancy, rent cap, tuition) are credible against the comps.";
+  $("r_flag").textContent=flag;
+  $("r_flag").style.background = r.vs<0 ? "var(--pass-bg)":"var(--go-bg)";
+  $("r_flag").style.borderColor = r.vs<0 ? "var(--pass)":"var(--go)";
+  $("r_break").innerHTML=[
+    ["Stabilized revenue",fmt$(r.rev)],["Y1 NOI (affordable rent)",fmt$(r.noi)],
+    ["Affordable rent $/SF","$"+r.rentPsf.toFixed(2)],["Target yield",pct(r.tgtYield)],
+    ["Implied max basis",fmt$(r.maxBasis)],["Less: CapEx",fmt$(r.capexTotal)],
+    ["Pre-buffer bid",fmt$(r.preBuf)],["Final bid (×0.95)",fmt$(r.bid)]
+  ].map(([k,v])=>`<tr><td>${k}</td><td class="num">${v}</td></tr>`).join("");
+}
+function renderGrid(){
+  $("gridbody").innerHTML = DEAL.gridOrder.map(key=>{
+    const r=computeView({...DEAL.base,...DEAL.presets[key]});
+    return `<tr><td>${DEAL.gridLabel[key]}</td><td class="num">${pct(DEAL.presets[key].occ)}</td>
+      <td class="num">$${r.rentPsf.toFixed(1)}</td><td class="num">${fmt$(r.maxBasis)}</td>
+      <td class="num">${fmt$(r.capexTotal)}</td><td class="num">${fmtM(r.bid)}</td>
+      <td class="num ${r.vs<0?'neg':'pos'}">${fmtM(r.vs)}</td></tr>`;
+  }).join("");
+}
+function cellPill(v){
+  const p=v.startsWith("P"), txt=v.replace(/^P |^F /,"");
+  const lab=v.startsWith("P")?"Pass":(v.startsWith("F")?"Fail":"");
+  return `<span class="pill ${p?'pass':'fail'}">${lab}</span>${txt&&txt!=v?(" "+txt):(v.length>2?" "+txt:"")}`;
+}
+function renderTests(){
+  $("testbody").innerHTML=DEAL.tests.rows.map(row=>{
+    const c=["Conservative","Lower Base","Upper Base","Aggressive"].map(k=>`<td>${cellPill(row.v[k])}</td>`).join("");
+    return `<tr><td>${row.g}</td>${c}</tr>`;
+  }).join("");
+  $("t_bc").textContent=DEAL.tests.binding; $("t_expl").textContent=DEAL.tests.expl;
+  $("t_resets").innerHTML=DEAL.tests.resets.map(x=>`<li>${x}</li>`).join("");
+}
+function renderComps(){
+  $("rentbody").innerHTML=DEAL.comps.rent.map(r=>`<tr><td>${r.t}</td>
+    <td class="num">${r.min==null?'—':'$'+r.min}</td><td class="num">${r.med==null?'—':'$'+r.med}</td>
+    <td class="num">${r.max==null?'—':'$'+r.max}</td><td style="text-align:left;color:var(--ink3);font-size:12px">${r.read}</td></tr>`).join("");
+  $("rentwarn").textContent=DEAL.comps.rentwarn;
+  $("salebody").innerHTML=`<p class="note">${DEAL.comps.sale}</p>`;
+}
+function renderTuition(){
+  $("tuibody").innerHTML=DEAL.tuition.bands.map(b=>`<tr><td>${b[0]}</td><td class="num">$${b[1].toLocaleString()}</td>
+    <td class="num"><b>$${b[2].toLocaleString()}</b></td><td class="num">$${b[3].toLocaleString()}</td></tr>`).join("");
+  $("tuinote").textContent=DEAL.tuition.note;
+}
+function renderCapex(){
+  $("cxbody").innerHTML=DEAL.capex.tiers.map(t=>`<tr><td>${t[0]}</td><td class="num">$${t[1]}</td>
+    <td class="num">${fmt$(t[2])}</td><td style="text-align:left;color:var(--ink3);font-size:12px">${t[3]}</td></tr>`).join("");
+  $("scopebody").innerHTML=DEAL.capex.scope.map(s=>`<tr><td>${s[0]}</td><td class="num">$${s[1]}</td><td class="num">${fmt$(s[2])}</td></tr>`).join("");
+  $("vebody").innerHTML=DEAL.capex.ve.map(v=>`<li>${v}</li>`).join("");
+}
+function renderSite(){
+  $("sitefacts").innerHTML=DEAL.site.facts.map(f=>`<div class="kv"><span class="key">${f[0]}</span><span class="val">${f[1]}</span></div>`).join("");
+  $("dealfacts").innerHTML=DEAL.site.deal.map(f=>`<div class="kv"><span class="key">${f[0]}</span><span class="val">${f[1]}</span></div>`).join("");
+  $("approachnote").textContent=DEAL.site.approachNote;
+  $("openitems").innerHTML=DEAL.site.open.map(o=>`<li>${o}</li>`).join("");
+}
+function renderSpine(){
+  $("spine").innerHTML=DEAL.spine.map(s=>`<div class="step"><div class="n">${s[0]}</div>
+    <div class="t"><b>${s[1]}</b><span>${s[2]}</span></div>
+    <div class="done" style="${s[3]!='done'?'color:var(--ink3)':''}">${s[3]=='done'?'✓ done':'pending'}</div></div>`).join("");
+}
+
+/* header + call */
+$("asof").textContent="As of "+DEAL.meta.asOf;
+$("dealname").textContent=DEAL.meta.name;
+$("dealsub").innerHTML=`<span class="arch">${DEAL.meta.archetype}</span><span class="arch">${DEAL.meta.approach}</span>${DEAL.meta.sub}`;
+$("verdict").textContent=DEAL.call.verdict; $("verdict").className="verdict v-"+DEAL.call.verdict;
+$("callbadge").className="callbadge b-"+DEAL.call.verdict;
+$("bctext").textContent=DEAL.call.binding; $("bcexpl").textContent=DEAL.call.expl;
+$("foot").innerHTML="Clay Cove Capital · ECE Underwriting Engine — reusable deal dashboard. Live figures recompute client-side using the conversion template's own backsolve logic (capacity × occupancy × tuition × rent-cap ÷ target-yield − CapEx, × buffer). Tuition and ECE cap inputs are flagged assumptions pending real comps. This is a review surface over the deal artifacts, not a system of record.";
+
+/* tabs */
+const TABS=[["scenario","Scenario & Bid"],["tests","Test Battery"],["comps","Comps"],["tuition","Tuition"],["capex","CapEx"],["site","Site & Deal"],["spine","The Spine"]];
+$("tabs").innerHTML=TABS.map((t,i)=>`<div class="tab${i==0?' active':''}" data-tab="${t[0]}">${t[1]}</div>`).join("");
+document.querySelectorAll(".tab").forEach(tab=>tab.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
+  tab.classList.add("active");
+  document.querySelector(`.panel[data-panel="${tab.dataset.tab}"]`).classList.add("active");
+});
+
+/* slider wiring */
+$("cap").oninput=e=>{state.cap=+e.target.value;render()};
+$("occ").oninput=e=>{state.occ=+e.target.value/100;render()};
+$("rc").oninput=e=>{state.rc=+e.target.value/100;render()};
+$("tui").oninput=e=>{state.tui=+e.target.value;render()};
+$("cx").oninput=e=>{state.cx=+e.target.value;render()};
+$("my").oninput=e=>{state.my=+e.target.value/1000;render()};
+$("sp").oninput=e=>{state.sp=+e.target.value/10000;render()};
+$("reset").onclick=()=>{state={...DEAL.base};syncSliders();render();$("preset").value="";};
+$("preset").onchange=e=>{ if(e.target.value){ state={...DEAL.base,...DEAL.presets[e.target.value]}; syncSliders(); render(); } };
+
+/* init */
+syncSliders(); render(); renderGrid(); renderTests(); renderComps(); renderTuition(); renderCapex(); renderSite(); renderSpine();
+</script>
+</body>
+</html>

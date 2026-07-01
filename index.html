@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCC ECE Underwriting — Pipeline</title><style>
+:root{--ink:#1a1a1a;--ink3:#6b6b6b;--line:#e2ded5;--line2:#d4cfc2;--paper:#faf8f3;--card:#fff;--accent:#3a4a3f;
+--go:#2f6b43;--watch:#9a6a16;--pass:#8f3b34;--go-bg:#eaf2ec;--watch-bg:#f6efe0;--pass-bg:#f5e9e7;--chip:#f1eee7;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Iowan Old Style','Palatino Linotype',Georgia,serif;background:var(--paper);color:var(--ink);font-size:15px}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 30px 80px}
+.brand{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);font-family:-apple-system,sans-serif;font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:10px;display:block}
+h1{font-size:26px;font-weight:600;margin:16px 0 2px;letter-spacing:-.01em}
+.sub{color:var(--ink3);font-size:14px;margin-bottom:20px}
+.counts{display:flex;gap:12px;margin-bottom:22px;font-family:-apple-system,sans-serif}
+.count{flex:1;border:1px solid var(--line2);border-radius:6px;padding:14px 18px;background:var(--card)}
+.count .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.count .v{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
+.count.go .v{color:var(--go)} .count.watch .v{color:var(--watch)} .count.pass .v{color:var(--pass)}
+table{width:100%;border-collapse:collapse;font-family:-apple-system,sans-serif;font-size:13px;background:var(--card);border:1px solid var(--line2);border-radius:6px;overflow:hidden}
+th,td{text-align:right;padding:11px 12px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child,td.name,td.bc{text-align:left}
+thead th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);font-weight:600;background:var(--paper)}
+tbody tr{cursor:pointer} tbody tr:hover{background:var(--paper)}
+td.name{font-weight:600;color:var(--ink)} td.bc{color:var(--ink3);font-size:12px;max-width:280px}
+.num{font-variant-numeric:tabular-nums}
+.chip{font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:var(--chip);border:1px solid var(--line);color:var(--accent)}
+.pill{font-size:11px;font-weight:700;letter-spacing:.04em;padding:2px 9px;border-radius:3px}
+.v-GO{background:var(--go-bg);color:var(--go)} .v-WATCH{background:var(--watch-bg);color:var(--watch)} .v-PASS{background:var(--pass-bg);color:var(--pass)}
+footer{margin-top:24px;font-family:-apple-system,sans-serif;font-size:11px;color:var(--ink3);border-top:1px solid var(--line);padding-top:12px;line-height:1.7}
+</style></head><body><div class="wrap">
+<span class="brand">Clay Cove Capital · ECE Underwriting Engine</span>
+<h1>Pipeline</h1><div class="sub">Every underwritten site. The call, the bid range, and the binding constraint — computed live from the engine. Click a row for the deal dashboard.</div>
+<div class="counts">
+  <div class="count go"><div class="k">GO</div><div class="v">0</div></div>
+  <div class="count watch"><div class="k">WATCH</div><div class="v">0</div></div>
+  <div class="count pass"><div class="k">PASS</div><div class="v">1</div></div>
+</div>
+<table><thead><tr><th>Site</th><th>Type</th><th>Call</th><th>Floor</th><th>Target</th><th>Stretch</th><th>Owner basis</th><th>Binding constraint</th></tr></thead>
+<tbody><tr onclick="location.href='deals/UT-Bountiful-750Main/dashboard.html'">
+      <td class="name">750 S Main St — Bountiful, UT</td>
+      <td><span class="chip">Conversion</span></td>
+      <td><span class="pill v-PASS">PASS</span></td>
+      <td class="num">−$0.34M</td><td class="num">$1.09M</td><td class="num">$3.92M</td>
+      <td class="num">$1.57M</td>
+      <td class="bc">Bid headroom vs owner basis (C3) — secondarily rent test (C1)</td></tr></tbody></table>
+<footer>Clay Cove Capital · ECE Underwriting Engine — portfolio rollup. Bid ranges and calls recomputed from <code>engine/</code> at build time across every <code>deals/*/</code>. Regenerate with <code>node web/build.mjs</code>.</footer>
+</div></body></html>
