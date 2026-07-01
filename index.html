@@ -30,16 +30,16 @@ footer{margin-top:24px;font-family:-apple-system,sans-serif;font-size:11px;color
 <h1>Pipeline</h1><div class="sub">Every underwritten site. The call, the bid range, and the binding constraint — computed live from the engine. Click a row for the deal dashboard.</div>
 <div class="counts">
   <div class="count go"><div class="k">GO</div><div class="v">0</div></div>
-  <div class="count watch"><div class="k">WATCH</div><div class="v">0</div></div>
-  <div class="count pass"><div class="k">PASS</div><div class="v">1</div></div>
+  <div class="count watch"><div class="k">WATCH</div><div class="v">1</div></div>
+  <div class="count pass"><div class="k">PASS</div><div class="v">0</div></div>
 </div>
 <table><thead><tr><th>Site</th><th>Type</th><th>Call</th><th>Floor</th><th>Target</th><th>Stretch</th><th>Owner basis</th><th>Binding constraint</th></tr></thead>
 <tbody><tr onclick="location.href='deals/UT-Bountiful-750Main/dashboard.html'">
       <td class="name">750 S Main St — Bountiful, UT</td>
       <td><span class="chip">Conversion</span></td>
-      <td><span class="pill v-PASS">PASS</span></td>
-      <td class="num">−$0.34M</td><td class="num">$1.09M</td><td class="num">$3.92M</td>
+      <td><span class="pill v-WATCH">WATCH</span></td>
+      <td class="num">$0.22M</td><td class="num">$1.91M</td><td class="num">$5.36M</td>
       <td class="num">$1.57M</td>
-      <td class="bc">Bid headroom vs owner basis (C3) — secondarily rent test (C1)</td></tr></tbody></table>
+      <td class="bc">Rent test (C1) — affordable rent vs ECE comp range</td></tr></tbody></table>
 <footer>Clay Cove Capital · ECE Underwriting Engine — portfolio rollup. Bid ranges and calls recomputed from <code>engine/</code> at build time across every <code>deals/*/</code>. Regenerate with <code>node web/build.mjs</code>.</footer>
 </div></body></html>

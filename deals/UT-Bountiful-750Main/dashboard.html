@@ -181,6 +181,41 @@
     </div>
   </div>
 
+  <!-- SITE DEV BUDGET -->
+  <div class="panel" data-panel="sitedev">
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <h3>Cost stack — flex the fixed buckets</h3>
+          <div class="ctrl"><label>Land / acquisition <b id="o_sd_land"></b></label><input type="range" id="sd_land" min="1200000" max="2400000" step="25000"></div>
+          <div class="ctrl"><label>Building shell &amp; finishes $/SF <b id="o_sd_shell"></b></label><input type="range" id="sd_shell" min="80" max="160" step="1"></div>
+          <div class="ctrl"><label>Soft costs $/SF <b id="o_sd_soft"></b></label><input type="range" id="sd_soft" min="20" max="55" step="1"></div>
+          <div class="ctrl"><label>FF&amp;E $/SF <b id="o_sd_ffne"></b></label><input type="range" id="sd_ffne" min="15" max="35" step="1"></div>
+          <button class="resetbtn" id="sd_reset">Reset to base</button>
+          <div class="note" style="margin-top:12px" id="sd_note"></div>
+        </div>
+        <div class="card">
+          <h3>Site-dev scope reference</h3>
+          <table><tbody id="sd_scope"></tbody></table>
+          <h3 style="margin-top:16px">Playground / parking scenarios</h3>
+          <table><thead><tr><th>Scenario</th><th>Stalls</th><th>Playground SF</th></tr></thead><tbody id="sd_sitescen"></tbody></table>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h3>Residual for site development — by scenario</h3>
+          <table><thead><tr><th>Case</th><th>Max all-in</th><th>−Land</th><th>−Shell</th><th>−Soft</th><th>−FF&amp;E</th><th>= Site dev</th><th>$/SF</th></tr></thead>
+          <tbody id="sd_body"></tbody></table>
+          <div class="note warn" id="sd_read" style="margin-top:12px"></div>
+        </div>
+        <div class="card">
+          <h3>Zac's question, answered</h3>
+          <p class="note">If land costs <b id="sd_q_land"></b>, shell &amp; finishes <b id="sd_q_shell"></b>, and soft + FF&amp;E <b id="sd_q_soft"></b>, then at the <b>Target</b> case there's <b id="sd_q_resid"></b> left for site development. Known Goddard site scope (playground + turf + bollards) runs ~$290–450K before heavy civil, leaving <b id="sd_q_cushion"></b> for the unpriced parking/civil/grading work on this lot.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- COMPS -->
   <div class="panel" data-panel="comps">
     <div class="card">
@@ -243,7 +278,7 @@
    To render a new deal: replace DEAL with that deal's artifacts
    (or, in the Claude Code build, fetch the deal's JSON files).
    ============================================================ */
-const DEAL = {"meta":{"id":"UT-BOUNTIFUL-750MAIN","name":"750 S Main St — Bountiful, UT","archetype":"Conversion","approach":"Off-market acquisition","asOf":"2026-06-26","sub":"11,574 SF Class B office (1964) · 0.85 AC · ~92% vacant · Davis County / Salt Lake City"},"call":{"verdict":"PASS","binding":"Bid headroom vs owner basis (C3) — secondarily rent test (C1)","expl":"A basis deal, not a yield deal. YOC and spread pass by construction at every case. CCC's defensible max bid (Floor −$0.34M, Target $1.09M) sits below the owner's ~$1.57M April-2026 cost. It only clears at Upper Base / Aggressive, which require occupancy 90–95% + rent-cap 18–20% + Base/High tuition stacking at once — and the affordable rent those cases imply ($36–49/SF) is far above any rent comp in hand. C1 fails exactly where C3 passes."},"base":{"cap":120,"occ":0.85,"rc":0.15,"tui":1790,"cx":200,"my":0.075,"sp":0.02,"buffer":0.05,"sf":11574,"owner":1570500},"presets":{"Conservative":{"cap":120,"occ":0.8,"rc":0.13,"tui":1521.5,"cx":235,"my":0.0766,"sp":0.02},"Lower Base":{"cap":120,"occ":0.85,"rc":0.15,"tui":1790,"cx":200,"my":0.075,"sp":0.02},"Upper Base":{"cap":120,"occ":0.9,"rc":0.18,"tui":1790,"cx":200,"my":0.075,"sp":0.02},"Aggressive":{"cap":120,"occ":0.95,"rc":0.2,"tui":2058.5,"cx":170,"my":0.0725,"sp":0.02}},"gridOrder":["Conservative","Lower Base","Upper Base","Aggressive"],"gridLabel":{"Conservative":"Conservative (Floor)","Lower Base":"Lower Base (Target)","Upper Base":"Upper Base","Aggressive":"Aggressive (Stretch)"},"tests":{"binding":"C3 — bid vs owner basis (then C1 rent)","expl":"YOC and spread pass by construction; the deal dies on basis. Max bid beats the owner's ~$1.57M only at Upper Base / Aggressive, and those same cases imply $36–49/SF affordable rent — far above the $10–20/SF net-effective office comps in hand. No single reset clears both gates at a credible scenario.","resets":["Real ECE NNN rent comps ($30+/SF) AND real Goddard tuition at/above assumed Base — could make Upper Base credible. Most worth checking before walking.","Site plan supports >150 licensed seats — lifts revenue 30–50%, the biggest mechanical lever.","Owner sells near ~$1.57M basis (no markup) AND CapEx value-engineered to ~$180/SF.","By-right entitlement confirmed (no CUP/rezone) — removes uncosted carry/timeline drag."],"rows":[{"g":"S1 · Yield-on-cost (≥9.25%)","v":{"Conservative":"P 9.59%","Lower Base":"P 9.66%","Upper Base":"P 9.73%","Aggressive":"P 9.57%"}},{"g":"S2 · Spread vs cap (≥200bp)","v":{"Conservative":"P","Lower Base":"P","Upper Base":"P","Aggressive":"P"}},{"g":"S3 · Capacity sanity (164–184)","v":{"Conservative":"F 120","Lower Base":"F 120","Upper Base":"F 120","Aggressive":"F 120"}},{"g":"S4 · Occupancy realism (≥80%)","v":{"Conservative":"P 80%","Lower Base":"P 85%","Upper Base":"P 90%","Aggressive":"P 95%"}},{"g":"C1 · Rent test (within comp)","v":{"Conservative":"F 19.7","Lower Base":"F 28.4","Upper Base":"F 36.1","Aggressive":"F 48.7"}},{"g":"C2 · CapEx reasonableness","v":{"Conservative":"F 235","Lower Base":"P 200","Upper Base":"P 200","Aggressive":"P 170"}},{"g":"C3 · Bid headroom vs owner","v":{"Conservative":"F -0.34M","Lower Base":"F 1.09M","Upper Base":"P 1.98M","Aggressive":"P 3.92M"}},{"g":"C4 · Replacement-cost check","v":{"Conservative":"P","Lower Base":"F","Upper Base":"F","Aggressive":"F"}}]},"comps":{"rent":[{"t":"T1 · subject building (net-eff)","min":10,"med":12,"max":14,"read":"Subject office leases clear $14–20 FS gross; ~$10–14 net of opex"},{"t":"T2 · Davis/Weber 2–4★ (net-eff)","min":17,"med":18.5,"max":20,"read":"Submarket office ~$25 gross less opex"},{"t":"T3 · ECE NNN comps","min":null,"med":null,"max":null,"read":"GAP — not in CoStar office page; pull from research DB"}],"rentwarn":"All office leases are Full-Service / Modified-Gross, not NNN. The rent test compares net-effective. The figure the test truly needs — Goddard/Primrose NNN childcare rent — is not in the uploaded materials and is flagged for the research DB.","sale":"Subject's own arm's-length trade Apr-2026: <b>$1,570,500 · $135.69/SF · 7.66% cap</b> (office). Submarket 2–4★ office sales ~$162/SF. No ECE-use cap comps available — the 7.66% office cap is used as a flagged proxy for the ECE going-in cap (n=1, office not ECE)."},"tuition":{"bands":[["Infants",1700,2000,2300],["Toddlers",1615,1900,2185],["Twos",1530,1800,2070],["Preschool / Pre-K",1445,1700,1955]],"note":"Income-indexed estimate (Davis County median HH income ~$101.5K, 1 direct competitor within 3mi). NOT triangulated from published rates — replace with ≥2 real operator rate cards on DB connect. This is the most leveraged assumption carrying the least real data."},"capex":{"tiers":[["Conservative",235,2719890,"Upper half of Pflugerville band — 1964 vintage + sprinkler trigger"],["Base",200,2314800,"Benchmark midpoint, full Goddard scope"],["Aggressive",170,1967580,"Lean VE; just below $180 floor — a stretch, not a base"]],"scope":[["Crash-rated bollards / fencing",14,162000],["Full HVAC replacement",24,278000],["All-new playground + turf",11,127000],["Restroom relocations (code)",9,104000],["Fire-sprinkler retrofit (occupancy change)",6,69000]],"ve":["Bollard COUNT via layout (never the rating) — biggest lever, save ~$4–7/SF","Right-size playground to actual licensed capacity — save ~$2–3/SF","Reuse recent office finishes where code allows — save ~$2–4/SF","Trim MEP to HVAC-only if survey supports — save ~$1–3/SF (never cut sprinkler)"]},"site":{"facts":[["Building SF (CoStar RBA)","11,574"],["Land","0.85 AC / 37,026 SF"],["Year built","1964"],["Construction","Masonry, 1-story, 14′ slab-to-slab"],["Parking","51 surface (4.41/1,000)"],["Sprinklers","None — retrofit likely on occupancy change"],["Zoning","R-1-10 (residential)"],["Current use","Class B office, ~92% vacant"]],"deal":[["Approach","Off-market to current owner"],["Owner / counterparty","King Street Realty & Mgmt LLC"],["Owner cost basis","$1,570,500 ($135.69/SF)"],["Trade date","April 2026"],["Cap at trade","7.66%"],["Asking rent","$23.50/SF MG (not NNN)"],["List sale price","None — marketed for lease"]],"approachNote":"Zoning is R-1-10 (residential). Childcare is almost certainly not by-right — expect a CUP or rezone. Treat entitlement as a live gate, and note its carry/timeline cost is not yet in the model.","open":["Owner basis ($1.57M) vs max bid — an off-market spread problem, decide whether to engage at all.","Tuition (assumed) + ECE cap (office proxy) need real comps — could move the grid materially.","R-1-10 entitlement: CUP/rezone path + cost not yet underwritten.","GC takeoff to replace benchmark CapEx.","Site plan: confirm licensed seats the lot actually supports."]},"spine":[["1","Intake → site_card.json","Raw inbound → canonical record + archetype + flags","done"],["2","Comps → comps.json","Sale/lease comps → rent tiers + median cap","done"],["3","Tuition → tuition.json","Age-band Low/Base/High by submarket","done"],["4","CapEx → capex.json","Bottom-up tiers + Goddard scope + VE targets","done"],["5","Underwrite → engine","buildGrid backsolves max bid vs owner basis","done"],["6","Test battery → tests.json","Engine gates across scenarios → binding constraint + call","done"],["7","Deal memo → deal_memo.md","Deal card + IC memo in CCC voice","next"],["8","Pipeline rollup","Log to master asset log + dashboard","next"]]};
+const DEAL = {"meta":{"id":"UT-BOUNTIFUL-750MAIN","name":"750 S Main St — Bountiful, UT","archetype":"Conversion","approach":"Off-market acquisition","asOf":"2026-07-01","sub":"11,574 SF Class B office (1964) · 0.84 AC · ~92% vacant · C-G zoning (childcare by-right) · Davis County / Salt Lake City"},"call":{"verdict":"WATCH","binding":"Rent test (C1) — affordable rent vs ECE comp range","expl":"Revised 7/1 after the Goddard/CCC/Newmark thread: capacity corrected to ~150 (Goddard operator view, 11 classrooms) and zoning confirmed C-G with childcare BY-RIGHT (CoStar's R-1-10 was wrong). Both corrections help: the Target case now clears the owner's ~$1.57M basis by ~$0.34M, and the entitlement/CUP gate is gone. YOC, spread, and capacity all pass. What now binds is the RENT TEST — the affordable rent the model needs ($24.60/SF Floor, $35.49/SF Target) sits above the $10–20/SF net-effective office comps in hand. WATCH: moves to GO if real ECE/childcare NNN rent comps validate the mid-$20s–$30s. A rent-validation WATCH, not a price-cut WATCH."},"base":{"cap":150,"occ":0.85,"rc":0.15,"tui":1790,"cx":200,"my":0.075,"sp":0.02,"buffer":0.05,"sf":11574,"owner":1570500},"presets":{"Conservative":{"cap":150,"occ":0.8,"rc":0.13,"tui":1521.5,"cx":235,"my":0.0766,"sp":0.02},"Lower Base":{"cap":150,"occ":0.85,"rc":0.15,"tui":1790,"cx":200,"my":0.075,"sp":0.02},"Upper Base":{"cap":150,"occ":0.9,"rc":0.18,"tui":1790,"cx":200,"my":0.075,"sp":0.02},"Aggressive":{"cap":150,"occ":0.95,"rc":0.2,"tui":2058.5,"cx":170,"my":0.0725,"sp":0.02}},"gridOrder":["Conservative","Lower Base","Upper Base","Aggressive"],"gridLabel":{"Conservative":"Conservative (Floor)","Lower Base":"Lower Base (Target)","Upper Base":"Upper Base","Aggressive":"Aggressive (Stretch)"},"tests":{"binding":"C1 — rent test (affordable rent vs ECE comps)","expl":"With capacity at ~150 and C-G by-right zoning, the deal is no longer basis-bound: Target clears the owner's ~$1.57M by ~$0.34M and YOC/spread/capacity pass. The live constraint is rent — affordable rent of $24.60/SF (Floor) to $35.49/SF (Target) sits above the $10–20/SF net-effective office comps in hand. Only credible if purpose-fit childcare (Goddard) commands an NNN premium over office — plausible but unverified. One testable question decides it: does ECE rent here clear the mid-$20s–$30s NNN?","resets":["PRIMARY: real ECE/childcare NNN rent comps at ~$25–35/SF (Davis County/SLC) would validate C1 and move this to GO at Target. The single decision-relevant data pull.","Confirm ~150 licensed FTEs holds once the floor plan sets west-side-classroom playground access.","Owner engages near ~$1.57M basis — Target bid $1.91M leaves ~$0.34M of room.","Tuition validated at/above assumed Base — supports the revenue behind the rent."],"rows":[{"g":"S1 · Yield-on-cost (≥9.25%)","v":{"Conservative":"P 9.70%","Lower Base":"P 9.73%","Upper Base":"P 9.78%","Aggressive":"P 9.61%"}},{"g":"S2 · Spread vs cap (≥200bp)","v":{"Conservative":"P","Lower Base":"P","Upper Base":"P","Aggressive":"P"}},{"g":"S3 · Capacity sanity (pro-rata)","v":{"Conservative":"P 150","Lower Base":"P 150","Upper Base":"P 150","Aggressive":"P 150"}},{"g":"S4 · Occupancy realism (≥80%)","v":{"Conservative":"P 80%","Lower Base":"P 85%","Upper Base":"P 90%","Aggressive":"P 95%"}},{"g":"C1 · Rent test (within comp)","v":{"Conservative":"F 24.6","Lower Base":"F 35.5","Upper Base":"F 45.1","Aggressive":"F 60.8"}},{"g":"C2 · CapEx reasonableness","v":{"Conservative":"F 235","Lower Base":"P 200","Upper Base":"P 200","Aggressive":"P 170"}},{"g":"C3 · Bid headroom vs owner","v":{"Conservative":"F 0.22M","Lower Base":"P 1.91M","Upper Base":"P 3.02M","Aggressive":"P 5.36M"}},{"g":"C4 · Replacement-cost check","v":{"Conservative":"P","Lower Base":"F","Upper Base":"F","Aggressive":"F"}}]},"comps":{"rent":[{"t":"T1 · subject building (net-eff)","min":10,"med":12,"max":14,"read":"Subject office leases clear $14–20 FS gross; ~$10–14 net of opex"},{"t":"T2 · Davis/Weber 2–4★ (net-eff)","min":17,"med":18.5,"max":20,"read":"Submarket office ~$25 gross less opex"},{"t":"T3 · ECE NNN comps","min":null,"med":null,"max":null,"read":"GAP — THE binding input now. Rent test needs $24–35/SF; pull real ECE NNN comps from research DB"}],"rentwarn":"All office leases are Full-Service / Modified-Gross, not NNN. The rent test compares net-effective. The figure the test truly needs — Goddard/Primrose NNN childcare rent — is not in the uploaded materials and is now the single binding input flagged for the research DB.","sale":"Subject's own arm's-length trade Apr-2026: <b>$1,570,500 · $135.69/SF · 7.66% cap</b> (office) — this is the owner's OWN acquisition (their cost basis / anchor floor), not a list price. Owner newly willing to consider a sale, no price set (Newmark 7/1). No ECE-use cap comps available — 7.66% office cap used as a flagged proxy."},"tuition":{"bands":[["Infants",1700,2000,2300],["Toddlers",1615,1900,2185],["Twos",1530,1800,2070],["Preschool / Pre-K",1445,1700,1955]],"note":"Income-indexed estimate (Davis County median HH income ~$101.5K, 1 direct competitor within 3mi). NOT triangulated from published rates — replace with ≥2 real operator rate cards on DB connect. This is the most leveraged assumption carrying the least real data."},"capex":{"tiers":[["Conservative",235,2719890,"Upper half of Pflugerville band — 1964 vintage + sprinkler trigger"],["Base",200,2314800,"Benchmark midpoint, full Goddard scope"],["Aggressive",170,1967580,"Lean VE; just below $180 floor — a stretch, not a base"]],"scope":[["Crash-rated bollards / fencing",14,162000],["Full HVAC replacement",24,278000],["All-new playground + turf",11,127000],["Restroom relocations (code)",9,104000],["Fire-sprinkler retrofit (occupancy change)",6,69000]],"ve":["Bollard COUNT via layout (never the rating) — biggest lever, save ~$4–7/SF","Right-size playground to actual licensed capacity — save ~$2–3/SF","Reuse recent office finishes where code allows — save ~$2–4/SF","Trim MEP to HVAC-only if survey supports — save ~$1–3/SF (never cut sprinkler)"]},"site":{"facts":[["Building SF (CoStar RBA)","11,574"],["Land","0.84 AC / 37,026 SF"],["Year built","1964"],["Construction","Masonry, 1-story, 14′ slab-to-slab"],["Parking","S1: 35 stalls · S2: 30 stalls (CoStar showed 51 — reconcile)"],["Sprinklers","None — retrofit likely on occupancy change"],["Zoning","C-G — childcare BY-RIGHT (corrected from CoStar's R-1-10)"],["Capacity (Goddard view)","~150 FTE · 11 classrooms"],["Playground","S1: 4,721 SF · S2: 7,831 SF (vs 13,600 prototype)"],["Current use","Class B office, ~92% vacant"]],"deal":[["Approach","Off-market to current owner"],["Owner / counterparty","King Street Realty & Mgmt LLC"],["Sell-side intro","JR Moore, Newmark Mountain West"],["Owner cost basis","$1,570,500 ($135.69/SF) — Apr-2026 own purchase"],["Cap at trade","7.66%"],["Asking rent","$23.50/SF MG (not NNN)"],["List sale price","None — owner newly open to sale, no price set"]],"approachNote":"Zoning is C-G (Commercial General) and childcare (Tutoring/Dance/Preschool/Daycare) is a BY-RIGHT permitted use — validated by Goddard + CCC (7/1). No CUP or rezone required; the prior entitlement gate is removed. Binding constraint is now the site's playground area under lot/access limits and the ECE rent assumption.","open":["ECE/childcare NNN rent comps — now THE binding input. Rent test needs $24–35/SF; office comps are $10–20/SF net-effective. Pull from research DB / GreenStreet.","Confirm ~150 licensed FTEs once floor plan sets (west-side-classroom playground access limits usable rooms).","Tuition (assumed) + ECE cap (office proxy) still need real comps.","GC takeoff to replace benchmark CapEx.","Site plan: S1 (35 stalls / 4,721 SF playground) vs S2 (30 stalls / 7,831 SF) — Goddard to weigh in on workability.","Reconcile parking (CoStar 51 vs site-plan 30–35)."]},"spine":[["1","Intake → site_card.json","Raw inbound → canonical record + archetype + flags","done"],["2","Comps → comps.json","Sale/lease comps → rent tiers + median cap","done"],["3","Tuition → tuition.json","Age-band Low/Base/High by submarket","done"],["4","CapEx → capex.json","Bottom-up tiers + Goddard scope + VE targets","done"],["5","Underwrite → engine","buildGrid backsolves max bid vs owner basis","done"],["6","Test battery → tests.json","Engine gates across scenarios → binding constraint + call","done"],["7","Deal memo → deal_memo.md","Deal card + IC memo in CCC voice","next"],["8","Pipeline rollup","Log to master asset log + dashboard","next"]],"siteDev":{"land":1570500,"shell_psf":117,"soft_psf":36,"ffne_psf":22,"scopeRef":{"playground_turf":127000,"bollards_fencing":162000,"unpriced":"parking reconfig, drop-off, civil/grading, utilities, stormwater"},"siteScenarios":[["S1",35,4721],["S2",30,7831],["Prototype","—",13600]],"note":"Residual = max supportable all-in (NOI ÷ target yield, per scenario) − land − shell/finishes − soft − FF&E. Positive = budget available for site development. Known Goddard site scope runs ~$290–450K before heavy civil; the unpriced civil on this 0.84-AC lot is the real unknown Zac flagged. Land defaults to the owner's $1.57M basis — flex it to test a seller markup."}};
 
 /* ---------- engine: inlined from engine/ — single source of truth (do not edit; run `node web/build.mjs`) ---------- */
 const STANDARDS = {
@@ -256,6 +291,8 @@ const STANDARDS = {
     "occ_floor": 0.80,
     "negotiation_buffer": 0.05,
     "prototype_capacity": [164, 184],
+    "prototype_sf": 12500,
+    "capacity_tolerance": 0.05,
     "conversion_capex_band_psf": [180, 254]
   },
 
@@ -362,6 +399,31 @@ function buildGrid(deal) {
 }
 
 /**
+ * Site-development residual for one case — inverts the backsolve. Of the max supportable
+ * all-in basis (max_basis), after land + building shell + soft + FF&E, what's LEFT for
+ * site development (playground, turf, bollards, parking, civil)? The gating unknown on a
+ * tight lot. `inputs` = { land, shell_psf, soft_psf, ffne_psf }.
+ */
+function siteDevResidualCase(maxBasis, inputs, sf) {
+  const shell = inputs.shell_psf * sf;
+  const soft = inputs.soft_psf * sf;
+  const ffne = inputs.ffne_psf * sf;
+  const residual = maxBasis - inputs.land - shell - soft - ffne;
+  return { max_all_in: maxBasis, land: inputs.land, shell, soft, ffne, residual, psf: residual / sf };
+}
+
+/**
+ * Site-dev residual across the grid. Reads deal.site_dev; returns null if the deal carries none.
+ * @param {import("./schema.mjs").CaseResult[]} grid
+ * @param {import("./schema.mjs").Deal} deal
+ */
+function siteDevGrid(grid, deal) {
+  const sd = deal.site_dev;
+  if (!sd) return null;
+  return grid.map((r) => ({ case: r.case, ...siteDevResidualCase(r.max_basis, sd, deal.sf) }));
+}
+
+/**
  * tests.mjs — the go/no-go battery. Deterministic gate math only.
  *
  * Division of labor: the engine returns each gate's PASS/FAIL + value + margin per
@@ -410,12 +472,7 @@ function runCaseTests(r, deal) {
       margin_bps: bps(deal.spread) - g.min_spread_bps,
       note: `structural — target yield = market yield + spread. The real question is whether the market-yield anchor is right; comp median cap (${deal.median_cap ?? "n/a"}) validates it — a comps-quality check, flagged separately.`,
     },
-    S3_capacity: {
-      pass: isWithin(deal.capacity, g.prototype_capacity),
-      value: deal.capacity,
-      threshold: `${g.prototype_capacity[0]}–${g.prototype_capacity[1]}`,
-      note: deal.capacity < g.prototype_capacity[0] ? "below prototype — reduced-capacity basis" : undefined,
-    },
+    S3_capacity: capacitySanity(deal, g),
     S4_occ: { pass: r_occ(r, deal) >= g.occ_floor, value: r_occ(r, deal), threshold: g.occ_floor },
     C1_rent: {
       pass: band ? r.aff_rent_psf >= band[0] && r.aff_rent_psf <= band[1] : false,
@@ -471,6 +528,26 @@ function runBattery(grid, deal) {
 // ── helpers ───────────────────────────────────────────────────────────────────
 const round = (n, d) => Number(n.toFixed(d));
 const isWithin = (v, [lo, hi]) => v >= lo && v <= hi;
+
+/**
+ * S3 capacity sanity — pro-rata to the building's SF, not a flat 164–184.
+ * The prototype range is for the 12,500 SF ground-up; a conversion scales down by SF.
+ * A small tolerance keeps a credible operator number (e.g. 150 in 11,574 SF) from failing
+ * a sanity check by a rounding hair, while a genuinely thin capacity (e.g. 120) still fails.
+ */
+function capacitySanity(deal, g) {
+  const scale = deal.sf / g.prototype_sf;
+  const tol = g.capacity_tolerance ?? 0;
+  const lo = g.prototype_capacity[0] * scale;
+  const hi = g.prototype_capacity[1] * scale;
+  const pass = deal.capacity >= lo * (1 - tol) && deal.capacity <= hi * (1 + tol);
+  return {
+    pass,
+    value: deal.capacity,
+    threshold: `${Math.round(lo)}–${Math.round(hi)} (pro-rata ${deal.sf.toLocaleString()} SF)`,
+    note: !pass && deal.capacity < lo ? "below pro-rata prototype range — thin capacity for the SF" : undefined,
+  };
+}
 const r_occ = (r) => STANDARDS.scenario_levers[r.case].occ;                 // occupancy lever for the case
 const capexPsf = (r, deal) => Math.round(r.capex_total / deal.sf);
 const headroomAnchor = (deal) => deal.ask ?? deal.owner_basis;             // ask if listed, else owner basis (off-market)
@@ -501,11 +578,14 @@ function buildBindingNote(always_failing, headroom_clears_at) {
 function underwrite(deal) {
   const grid = buildGrid(deal);
   const battery = runBattery(grid, deal);
+  const site_dev = siteDevGrid(grid, deal);
   const byCase = Object.fromEntries(grid.map((r) => [r.case, r]));
+  const sdByCase = site_dev ? Object.fromEntries(site_dev.map((r) => [r.case, r])) : null;
   const m = STANDARDS.grid_mapping;
   return {
     grid,
     battery,
+    site_dev,
     headline: {
       call: battery.call,
       floor_bid: byCase[m.floor].final_bid,
@@ -513,6 +593,7 @@ function underwrite(deal) {
       stretch_bid: byCase[m.stretch].final_bid,
       owner_basis: deal.owner_basis,
       spread_to_owner_at_target: byCase[m.target].vs_owner,
+      target_site_dev_residual: sdByCase ? sdByCase[m.target].residual : null,
       binding_note: battery.binding_note,
     },
   };
@@ -620,7 +701,7 @@ $("bctext").textContent=DEAL.call.binding; $("bcexpl").textContent=DEAL.call.exp
 $("foot").innerHTML="Clay Cove Capital · ECE Underwriting Engine — reusable deal dashboard. Live figures recompute client-side using the conversion template's own backsolve logic (capacity × occupancy × tuition × rent-cap ÷ target-yield − CapEx, × buffer). Tuition and ECE cap inputs are flagged assumptions pending real comps. This is a review surface over the deal artifacts, not a system of record.";
 
 /* tabs */
-const TABS=[["scenario","Scenario & Bid"],["tests","Test Battery"],["comps","Comps"],["tuition","Tuition"],["capex","CapEx"],["site","Site & Deal"],["spine","The Spine"]];
+const TABS=[["scenario","Scenario & Bid"],["tests","Test Battery"],["sitedev","Site-Dev Budget"],["comps","Comps"],["tuition","Tuition"],["capex","CapEx"],["site","Site & Deal"],["spine","The Spine"]];
 $("tabs").innerHTML=TABS.map((t,i)=>`<div class="tab${i==0?' active':''}" data-tab="${t[0]}">${t[1]}</div>`).join("");
 document.querySelectorAll(".tab").forEach(tab=>tab.onclick=()=>{
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
@@ -640,8 +721,57 @@ $("sp").oninput=e=>{state.sp=+e.target.value/10000;render()};
 $("reset").onclick=()=>{state={...DEAL.base};syncSliders();render();$("preset").value="";};
 $("preset").onchange=e=>{ if(e.target.value){ state={...DEAL.base,...DEAL.presets[e.target.value]}; syncSliders(); render(); } };
 
+/* ---------- Site-Dev residual: inverts the backsolve (residual = engine's siteDevResidualCase) ---------- */
+let sdState={land:DEAL.siteDev.land, shell:DEAL.siteDev.shell_psf, soft:DEAL.siteDev.soft_psf, ffne:DEAL.siteDev.ffne_psf};
+function sdSync(){ $("sd_land").value=sdState.land; $("sd_shell").value=sdState.shell; $("sd_soft").value=sdState.soft; $("sd_ffne").value=sdState.ffne; }
+/* engine expects a deal-shaped object; build one from current DEAL for the grid cases */
+function dealForEngine(){
+  return {sf:DEAL.base.sf, owner_basis:DEAL.base.owner, buffer:DEAL.base.buffer,
+    capacity:DEAL.base.cap, tuition_base:DEAL.base.tui, spread:DEAL.base.sp,
+    capex_psf:{high:DEAL.presets.Conservative.cx, base:DEAL.presets["Lower Base"].cx, low:DEAL.presets.Aggressive.cx},
+    market_yield:{high:DEAL.presets.Conservative.my, base:DEAL.presets["Lower Base"].my, low:DEAL.presets.Aggressive.my}};
+}
+function renderSiteDev(){
+  const sf=DEAL.base.sf, ctx={sf,owner_basis:DEAL.base.owner,buffer:DEAL.base.buffer};
+  $("o_sd_land").textContent=fmt$(sdState.land); $("o_sd_shell").textContent="$"+sdState.shell;
+  $("o_sd_soft").textContent="$"+sdState.soft; $("o_sd_ffne").textContent="$"+sdState.ffne;
+  const inputs={land:sdState.land, shell_psf:sdState.shell, soft_psf:sdState.soft, ffne_psf:sdState.ffne};
+  let targetResid=0;
+  $("sd_body").innerHTML=DEAL.gridOrder.map(key=>{
+    const r=engineCompute(resolveCase(dealForEngine(),key),ctx);
+    const sd=siteDevResidualCase(r.max_basis, inputs, sf);   // engine — single source of truth for the residual
+    if(key==="Lower Base") targetResid=sd.residual;
+    return `<tr><td>${DEAL.gridLabel[key]}</td><td class="num">${fmt$(sd.max_all_in)}</td>
+      <td class="num">${fmt$(sd.land)}</td><td class="num">${fmt$(sd.shell)}</td>
+      <td class="num">${fmt$(sd.soft)}</td><td class="num">${fmt$(sd.ffne)}</td>
+      <td class="num ${sd.residual<0?'neg':'pos'}"><b>${fmt$(sd.residual)}</b></td>
+      <td class="num ${sd.residual<0?'neg':'pos'}">$${Math.round(sd.psf)}</td></tr>`;
+  }).join("");
+  const known=DEAL.siteDev.scopeRef.playground_turf+DEAL.siteDev.scopeRef.bollards_fencing;
+  const cushion=targetResid-known;
+  $("sd_read").textContent = targetResid<0
+    ? "At Target the residual is negative — no budget for site development once land + building are paid. The deal can't absorb site work at these inputs."
+    : "At Target ~"+fmt$(targetResid)+" is available for site development. Known Goddard site scope (~"+fmt$(known)+" playground+turf+bollards) leaves ~"+fmt$(cushion)+" for the unpriced parking/civil/grading — the real unknown on this lot.";
+  $("sd_read").style.background=targetResid<0?"var(--pass-bg)":"var(--go-bg)";
+  $("sd_read").style.borderColor=targetResid<0?"var(--pass)":"var(--go)";
+  $("sd_note").textContent=DEAL.siteDev.note;
+  $("sd_scope").innerHTML=[["Playground + turf",DEAL.siteDev.scopeRef.playground_turf],["Crash bollards + fencing",DEAL.siteDev.scopeRef.bollards_fencing],["Known subtotal",known]]
+    .map(x=>`<tr><td>${x[0]}</td><td class="num">${fmt$(x[1])}</td></tr>`).join("")
+    + `<tr><td>Unpriced</td><td style="text-align:left;color:var(--ink3);font-size:12px">${DEAL.siteDev.scopeRef.unpriced}</td></tr>`;
+  $("sd_sitescen").innerHTML=DEAL.siteDev.siteScenarios.map(s=>`<tr><td>${s[0]}</td><td class="num">${s[1]}</td><td class="num">${typeof s[2]==='number'?s[2].toLocaleString():s[2]}</td></tr>`).join("");
+  $("sd_q_land").textContent=fmt$(sdState.land); $("sd_q_shell").textContent=fmt$(sdState.shell*sf);
+  $("sd_q_soft").textContent=fmt$(sdState.soft*sf+sdState.ffne*sf); $("sd_q_resid").textContent=fmt$(targetResid);
+  $("sd_q_cushion").textContent=fmt$(cushion);
+}
+$("sd_land").oninput=e=>{sdState.land=+e.target.value;renderSiteDev()};
+$("sd_shell").oninput=e=>{sdState.shell=+e.target.value;renderSiteDev()};
+$("sd_soft").oninput=e=>{sdState.soft=+e.target.value;renderSiteDev()};
+$("sd_ffne").oninput=e=>{sdState.ffne=+e.target.value;renderSiteDev()};
+$("sd_reset").onclick=()=>{sdState={land:DEAL.siteDev.land,shell:DEAL.siteDev.shell_psf,soft:DEAL.siteDev.soft_psf,ffne:DEAL.siteDev.ffne_psf};sdSync();renderSiteDev();};
+
 /* init */
 syncSliders(); render(); renderGrid(); renderTests(); renderComps(); renderTuition(); renderCapex(); renderSite(); renderSpine();
+sdSync(); renderSiteDev();
 </script>
 </body>
 </html>
